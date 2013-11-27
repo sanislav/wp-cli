@@ -371,6 +371,8 @@ class Scaffold_Command extends WP_CLI_Command {
 		$plugin_slug = $args[0];
 
 		$plugin_dir = WP_PLUGIN_DIR . "/$plugin_slug";
+		$plugin_dir = WP_CONTENT_DIR . "/themes/$plugin_slug";
+
 		$tests_dir = "$plugin_dir/tests";
 		$bin_dir = "$plugin_dir/bin";
 
