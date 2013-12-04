@@ -371,6 +371,7 @@ class Scaffold_Command extends WP_CLI_Command {
 		$plugin_slug = $args[0];
 
 		$plugin_dir 	= WP_CONTENT_DIR . "/themes/$plugin_slug";
+		$bin_dir 		= "$plugin_dir/bin";
 		$modules_dir 	= $plugin_dir . '/modules';
 
 		$modules_dirs 	= new DirectoryIterator( $modules_dir );
@@ -379,7 +380,6 @@ class Scaffold_Command extends WP_CLI_Command {
 				// add the testing folders to each module
 				$current_module_dir = $modules_dir . '/' . $fileinfo->getFilename();
 				$tests_dir 			= "$current_module_dir/tests";
-				$bin_dir 			= "$current_module_dir/bin";
 
 				$wp_filesystem->mkdir( $tests_dir );
 				$wp_filesystem->mkdir( $bin_dir );
@@ -389,7 +389,7 @@ class Scaffold_Command extends WP_CLI_Command {
 
 				$to_copy = array(
 					'install-wp-tests.sh' 	=> $bin_dir,
-					'.travis.yml' 			=> $modules_dir,
+					'.travis.yml' 			=> $plugin_dir,
 					'phpunit.xml' 			=> $modules_dir,
 					'test-sample.php' 		=> $tests_dir,
 				);
