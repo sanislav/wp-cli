@@ -370,39 +370,36 @@ class Scaffold_Command extends WP_CLI_Command {
 
 		$plugin_slug = $args[0];
 
-		$plugin_dir = WP_PLUGIN_DIR . "/$plugin_slug";
-		$plugin_dir = WP_CONTENT_DIR . "/themes/$plugin_slug";
+		$plugin_dir 	= WP_CONTENT_DIR . "/themes/$plugin_slug";
+		$modules_dir 	= $plugin_dir . '/modules';
 
-		$tests_dir = "$plugin_dir/tests";
-		$bin_dir = "$plugin_dir/bin";
+		$modules_dirs 	= new DirectoryIterator( $modules_dir );
+		foreach ( $modules_dirs as $fileinfo ) {
+			if ( $fileinfo->isDir() && ! $fileinfo->isDot() && '.' != substr( $fileinfo->getFilename(), 0, 1 ) ) {
+				// add the testing folders to each module
+				$current_module_dir = $modules_dir . '/' . $fileinfo->getFilename();
+				$tests_dir 			= "$current_module_dir/tests";
+				$bin_dir 			= "$current_module_dir/bin";
 
-		$wp_filesystem->mkdir( $tests_dir );
-		$wp_filesystem->mkdir( $bin_dir );
+				$wp_filesystem->mkdir( $tests_dir );
+				$wp_filesystem->mkdir( $bin_dir );
 
-		$this->create_file( "$tests_dir/bootstrap.php",
-			Utils\mustache_render( 'bootstrap.mustache', compact( 'plugin_slug' ) ) );
+				$this->create_file( "$tests_dir/bootstrap.php",
+					Utils\mustache_render( 'bootstrap.mustache', compact( 'plugin_slug' ) ) );
 
-		$to_copy = array(
-			'install-wp-tests.sh' => $bin_dir,
-			'.travis.yml' => $plugin_dir,
-			'phpunit.xml' => $plugin_dir,
-			'test-sample.php' => $tests_dir,
-		);
+				$to_copy = array(
+					'install-wp-tests.sh' 	=> $bin_dir,
+					'.travis.yml' 			=> $modules_dir,
+					'phpunit.xml' 			=> $modules_dir,
+					'test-sample.php' 		=> $tests_dir,
+				);
 
-		foreach ( $to_copy as $file => $dir ) {
-			$wp_filesystem->copy( WP_CLI_ROOT . "/templates/$file", "$dir/$file", true );
-		}
+				foreach ( $to_copy as $file => $dir ) {
+					$wp_filesystem->copy( WP_CLI_ROOT . "/templates/$file", "$dir/$file", true );
+				}
 
-		WP_CLI::success( "Created test files." );
-	}
-
-	private function create_file( $filename, $contents ) {
-		global $wp_filesystem;
-
-		$wp_filesystem->mkdir( dirname( $filename ) );
-
-		if ( !$wp_filesystem->put_contents( $filename, $contents ) ) {
-			WP_CLI::error( "Error creating file: $filename" );
+				WP_CLI::success( "Created test files." );
+			}
 		}
 	}
 
