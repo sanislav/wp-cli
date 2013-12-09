@@ -403,6 +403,16 @@ class Scaffold_Command extends WP_CLI_Command {
 		}
 	}
 
+	private function create_file( $filename, $contents ) {
+		global $wp_filesystem;
+
+		$wp_filesystem->mkdir( dirname( $filename ) );
+
+		if ( !$wp_filesystem->put_contents( $filename, $contents ) ) {
+			WP_CLI::error( "Error creating file: $filename" );
+		}
+	}
+
 	/**
 	 * If you're writing your files to your theme directory your textdomain also needs to be the same as your theme.
 	 * Same goes for when plugin is being used.
