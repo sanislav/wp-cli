@@ -394,8 +394,11 @@ class Scaffold_Command extends WP_CLI_Command {
 					'test-sample.php' 		=> $tests_dir,
 				);
 
+
 				foreach ( $to_copy as $file => $dir ) {
-					$wp_filesystem->copy( WP_CLI_ROOT . "/templates/$file", "$dir/$file", true );
+					// If files are already there don't overwrite them
+					if ( ! file_exists( "$dir/$file" ) )
+						$wp_filesystem->copy( WP_CLI_ROOT . "/templates/$file", "$dir/$file", true );
 				}
 
 				WP_CLI::success( "Created test files." );
